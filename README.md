@@ -20,7 +20,7 @@ $ sh dump-postgres-user-databases.sh PG-HOST LOGIN PATH-TO-DUMPS
 ```sh
 $ echo "your-postgres-host:5432:*:username:password" >> ~/.pgpass
 $ chmod 0600 ~/.pgpass
-$ sh dump-postgres-user-databases.sh PG-HOST LOGIN
+$ sh dump-postgres-user-databases.sh PG-HOST LOGIN PATH-TO-DUMPS
 ```
 
 License
