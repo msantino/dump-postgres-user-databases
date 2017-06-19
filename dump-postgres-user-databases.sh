@@ -12,31 +12,49 @@ usage(){
     exit 1
 }
 
+log() {
+   echo $1 >> $2
+}
+
+debug() {
+  echo $1
+}
+
+dump(){
+  local db=$1 dumpfile=$2 logfile=$3
+  pg_dump -v -Ft -h $HOST -U $LOGIN -d $db -f $dumpfile  >> $logfile 2>&1
+}
+
 # invoke  usage
 # call usage() function if filename not supplied
 [[ $# -eq 0 ]] && usage
 
-echo 
-echo "Check if [$DIR] exists"
+# Start script actions
+debug 
+debug "Check if [$DIR] exists"
 if [ ! -d "$DIR" ]; then
-   echo "Directory doesn't exists. Trying to create it."
+   debug "Directory doesn't exists. Trying to create it."
    mkdir $DIR
 else
-   echo "Directory exists. Continuing..."
+   debug "Directory exists. Continuing..."
 fi
-echo 
+debug 
 
-echo 
-echo "Connecting to host $HOST..."
-echo 
+debug 
+debug "Connecting to host $HOST..."
+debug 
 
 for d in $(psql -U $LOGIN -h $HOST -c "select datname from pg_database where datname not in ('template0', 'template1', 'rdsadmin', 'postgres') order by datname" -t) 
 do
-   echo "=== Generating dump for database [$d] ==="
+   # Database variables
    filename="$DIR/dump_${d}_$(date +"%y%m%d_%H%M%S")"
    dumpfile="${filename}.dmp"
    logfile="${filename}.log"
-   pg_dump -v -Ft -h $HOST -U $LOGIN -d $d -f $dumpfile  >> $logfile 2>&1
-   echo
-   echo
+
+   log "=== Starting dump for database [$d] at $(date +"%y-%m-%d %H:%M:%S") ===" $logfile
+   dump $d $dumpfile $logfile
+   log "=== Finished dump for database [$d] at $(date +"%y-%m-%d %H:%M:%S") ===" $logfile
+
+   debug "- ${d}: OK"
 done
+
