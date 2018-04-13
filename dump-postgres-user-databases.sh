@@ -44,7 +44,7 @@ debug
 debug "Connecting to host $HOST..."
 debug 
 
-for d in $(psql -U $LOGIN -h $HOST -c "select datname from pg_database where datname not in ('template0', 'template1', 'rdsadmin', 'postgres') order by datname" -t) 
+for d in $(psql -U $LOGIN -d postgres -h $HOST -c "select datname from pg_database where datname not in ('template0', 'template1', 'rdsadmin', 'postgres') order by datname" -t) 
 do
    # Database variables
    filename="$DIR/dump_${d}_$(date +"%y%m%d_%H%M%S")"
